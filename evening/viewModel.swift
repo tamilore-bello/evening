@@ -29,7 +29,10 @@ class viewModel: ObservableObject {
         
         listOfSets.append(qs)
         listOfSets.append(qs2)
-        
+        for index in 1...30 {
+            listOfSets.append(qs2)
+        }
+                
         return listOfSets
     }
 }
