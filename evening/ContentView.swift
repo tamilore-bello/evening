@@ -18,13 +18,17 @@ struct ContentView: View {
             Tab("Home", systemImage: "house") {
             }
             Tab("Sets", systemImage: "archivebox") {
-                NavigationStack {
-                    ZStack(alignment:.bottomTrailing){
+                ZStack(alignment:.bottomTrailing){
+                    NavigationStack {
                         List(listOfSets, id: \.name) { quiz in NavigationStack {
-                            HStack {
-                                Text(quiz.name)
-                                Spacer()
-                                Text(String(quiz.cset.count)+" terms")
+                            NavigationLink {
+                                quizSetView(quiz: quiz)
+                            } label: {
+                                HStack {
+                                    Text(quiz.name)
+                                    Spacer()
+                                    Text(String(quiz.cset.count)+" terms")
+                                }
                             }
                         } }
                         Button {
@@ -43,15 +47,47 @@ struct ContentView: View {
                 }
             }
             Tab("Settings", systemImage: "gearshape") {
-                
             }
         }
     }
 }
 
-func createNew() {
+
+struct quizSetView: View {
+    let quiz : QuizSet
+    var body: some View {
+        
+        List {
+            Section(header:
+                
+                Text(quiz.name)
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    , footer:
+                HStack {
+                    Text("Description")
+                    Spacer()
+                    Text(String(quiz.cset.count)+" Terms")
+                }
+            
+            ) {
+                ForEach(quiz.cset, id: \.id) { card in
+                    HStack {
+                        Text(card.term)
+                        Spacer()
+                        Text(String(card.def))
+                    }
+                }
+            }
+            
+        }
+    }
     
 }
+
+
 
 #Preview {
     ContentView()

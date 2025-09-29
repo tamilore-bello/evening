@@ -8,8 +8,9 @@
 import Foundation
 
 class Flashcard {
-    var term: String = ""
+    var term: String
     var def: String
+    var id = UUID()
     
     init(term: String, def: String) {
         self.term = term

@@ -12,6 +12,7 @@ class QuizSet {
     var name: String = ""
     var cset: [Flashcard] = []
     
+    
     func addFlashCard(card: Flashcard) {
         cset.append(card)
     }
