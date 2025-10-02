@@ -18,18 +18,18 @@ class viewModel: ObservableObject {
     func exec() -> [QuizSet] {
         // intantiate the quiz set and terms
         var listOfSets: [QuizSet] = []
-        var t1 = Flashcard(term: "apple", def: "a crunchy, red fruit")
-        var t2 = Flashcard(term: "pear", def: "a crunchy, oddly-shaped fruit")
+        let t1 = Flashcard(term: "apple", def: "a crunchy, red fruit")
+        let t2 = Flashcard(term: "pear", def: "a crunchy, oddly-shaped fruit")
         
-        var qs = QuizSet(name: "fruits")
-        var qs2 = QuizSet(name: "vegetables")
+        let qs = QuizSet(name: "fruits")
+        let qs2 = QuizSet(name: "vegetables")
       
         qs.addFlashCard(card: t1)
         qs.addFlashCard(card: t2)
         
         listOfSets.append(qs)
         listOfSets.append(qs2)
-        for index in 1...30 {
+        for _ in 1...30 {
             listOfSets.append(qs2)
         }
                 

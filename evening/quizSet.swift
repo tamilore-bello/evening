@@ -11,7 +11,7 @@ class QuizSet {
     
     var name: String = ""
     var cset: [Flashcard] = []
-    
+    var descript: String = ""
     
     func addFlashCard(card: Flashcard) {
         cset.append(card)
@@ -20,6 +20,12 @@ class QuizSet {
     init(name: String, cset: [Flashcard]) {
         self.name = name
         self.cset = cset
+    }
+    
+    init(name: String, cset: [Flashcard], descript: String) {
+        self.name = name
+        self.cset = cset
+        self.descript = descript
     }
     
     init(name: String) {
