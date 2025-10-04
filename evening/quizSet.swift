@@ -28,6 +28,11 @@ class QuizSet {
         self.descript = descript
     }
     
+    init(name: String, descript: String) {
+        self.name = name
+        self.descript = descript
+    }
+    
     init(name: String) {
         self.name = name
     }

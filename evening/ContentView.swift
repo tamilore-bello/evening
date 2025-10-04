@@ -8,56 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
-    let helper = viewModel()
+    @StateObject private var vm = QuizViewModel()
     var body: some View {
-        // List Set
-        let listOfSets = viewModel().exec()
-        
-        // Bottom Bar
         TabView {
             Tab("Home", systemImage: "house") {
             }
             Tab("Sets", systemImage: "archivebox") {
-                NavigationStack {
-                    Section(header: Text("Your Sets")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.leading, 40)
-                        .padding(.top, 50))
-                    {
-                        Text(String(listOfSets.count)+" Sets")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 40)
-                            .padding(.bottom, 20)
-                    }
-                    List(listOfSets, id: \.name) { quiz in NavigationStack {
-                        NavigationLink {
-                            quizSetView(quiz: quiz)
-                        } label: {
-                            HStack {
-                                Text(quiz.name)
-                                Spacer()
-                                Text(String(quiz.cset.count)+" terms")
-                            }
-                        }
-                    } }
-                    
-                    Button(action:  {
-                        // action here:???
-                    })
-                    {
-                        Image(systemName: "plus")
-                            .frame(maxWidth: .infinity) // Apply to the label
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .font(.title.weight(.medium))
-                            .cornerRadius(20)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                }
+                setTabView(viewModel: vm)
             }
             Tab("Settings", systemImage: "gearshape") {
             }
@@ -67,10 +24,9 @@ struct ContentView: View {
 
 
 struct quizSetView: View {
-    let quiz : QuizSet
+var quiz: QuizSet
+
     @State var showingPopover = false
-    @State var term: String = ""
-    @State var def: String = ""
     
     var body: some View {
         List {
@@ -81,70 +37,15 @@ struct quizSetView: View {
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text(quiz.descript)
-                
-                
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, 25)
                 Button("edit set ►") {
                     showingPopover = true
                 }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.bottom, 20)
                     .popover(isPresented: $showingPopover) {
-                        Text("New Card").font(.title)
-                            .fontWeight(.bold).padding(.top, 80)
-                            .padding(.bottom, 25)
-                        HStack {
-                            VStack {
-                                Text("Term")
-                                TextEditor(
-                                    //"Term",
-                                    text: $term
-                                )
-                                .padding()
-                                .frame(maxHeight: 100)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.blue, lineWidth: 2)
-                                )
-                            }
-                            VStack {
-                                Text("Definition")
-                                TextEditor(
-                                    //"Definition",
-                                    text: $def
-                                )
-                                .padding()
-                                .frame(maxHeight: 100)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.gray, lineWidth: 2)
-                                )
-                            }
-                        }
-                        .padding(.leading, 50)
-                        .padding(.trailing, 50)
-                        Button(action:  {
-                            // action here:???
-                        })
-                        {
-                            Image(systemName: "plus")
-                                .frame(maxWidth: 200) // Apply to the label
-                                .padding()
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .font(.title.weight(.medium))
-                                .cornerRadius(20)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        
-                        VStack {
-                            Button("Delete Set") {}.frame(alignment: .trailing)
-                            Button("Rename Set") {}
-                                .frame(alignment: .trailing)
-                            Button("Edit Description") {}
-                                .frame(alignment: .trailing)
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                        newCardView()
                     }
                 
                 
@@ -189,6 +90,169 @@ struct editFlashcardView: View {
         Text("Flashcard")
     }
 }
+
+struct newCardView: View {
+    @State var term: String = ""
+    @State var def: String = ""
+    var body: some View {
+        Text("New Card").font(.title)
+            .fontWeight(.bold).padding(.top, 80)
+            .padding(.bottom, 25)
+        HStack {
+            VStack {
+                Text("Term")
+                TextEditor(
+                    //"Term",
+                    text: $term
+                )
+                .padding()
+                .frame(maxHeight: 100)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.blue, lineWidth: 2)
+                )
+            }
+            VStack {
+                Text("Definition")
+                TextEditor(
+                    //"Definition",
+                    text: $def
+                )
+                .padding()
+                .frame(maxHeight: 100)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.gray, lineWidth: 2)
+                )
+            }
+        }
+        .padding(.leading, 50)
+        .padding(.trailing, 50)
+        Button(action:  {
+            // action here:???
+            
+        })
+        {
+            Image(systemName: "plus")
+                .frame(maxWidth: 200) // Apply to the label
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .font(.title.weight(.medium))
+                .cornerRadius(20)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        
+        VStack {
+            Button("Delete Set") {}.frame(alignment: .trailing)
+            Button("Rename Set") {}
+                .frame(alignment: .trailing)
+            Button("Edit Description") {}
+                .frame(alignment: .trailing)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+    }
+}
+
+struct newSetView: View {
+    @ObservedObject var viewModel: QuizViewModel
+
+    @Environment(\.dismiss) private var dismiss
+    @State var title: String = ""
+    @State var descr: String = ""
+    var body: some View {
+        Text("Create a New Set").font(.title)
+            .fontWeight(.bold).padding(.top, 80)
+            .padding(.bottom, 25)
+        VStack {
+            TextField("Title", text: $title).fontWeight(.bold)
+                .font(.title2)
+            VStack {
+                TextEditor(
+                    text: $descr
+                )
+                .padding()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.gray, lineWidth: 2)
+                )
+                .frame(maxWidth: .infinity, maxHeight: 100, alignment: .leading)
+                .padding(.bottom, 20)
+            }
+        }
+        .padding(.leading, 50)
+        .padding(.trailing, 50)
+        Button(action:  {
+            viewModel.addSet(name: title, descript: descr)
+            dismiss()
+        })
+        {
+            Image(systemName: "plus")
+                .frame(maxWidth: 200) // Apply to the label
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .font(.title.weight(.medium))
+                .cornerRadius(20)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+    }
+}
+
+struct setTabView : View {
+    //let helper = viewModel()
+    @State var showingPopover = false
+    @ObservedObject var viewModel: QuizViewModel
+    
+    var body: some View {
+        NavigationStack {
+            Section(header: Text("Your Sets")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, 40)
+                .padding(.top, 50))
+            {
+                Text(String(viewModel.listOfSets.count)+" Sets")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 40)
+                    .padding(.bottom, 20)
+            }
+            List(viewModel.listOfSets, id: \.name) { quiz in NavigationStack {
+                NavigationLink {
+                    quizSetView(quiz: quiz)
+                } label: {
+                    HStack {
+                        Text(quiz.name)
+                        Spacer()
+                        Text(String(quiz.cset.count)+" terms")
+                    }
+                }
+            } }
+            
+            Button(action:  {
+                showingPopover = true
+            })
+            {
+                Image(systemName: "plus")
+                    .frame(maxWidth: .infinity) // Apply to the label
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .font(.title.weight(.medium))
+                    .cornerRadius(20)
+            }
+            .popover(isPresented: $showingPopover) {
+                newSetView(viewModel: viewModel)
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+        }
+    }
+}
+
 #Preview {
     ContentView()
 }
