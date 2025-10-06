@@ -6,12 +6,15 @@
 //
 
 import Foundation
+internal import Combine
 
-class QuizSet {
+class QuizSet : ObservableObject, Identifiable {
     
-    var name: String = ""
-    var cset: [Flashcard] = []
-    var descript: String = ""
+    @Published var name: String = ""
+    @Published var cset: [Flashcard] = []
+    @Published var descript: String = ""
+    
+    let id = UUID()
     
     func addFlashCard(card: Flashcard) {
         cset.append(card)

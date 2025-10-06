@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 internal import Combine
 
-class QuizViewModel: ObservableObject {
+class QuizSetListViewModel: ObservableObject {
     @Published var message = "Hello, Single ViewModel!"
     @Published var listOfSets: [QuizSet] = []
     
@@ -41,8 +41,7 @@ class QuizViewModel: ObservableObject {
 //        }
 //    }
     
-    func addSet(name: String, descript: String) {
-        let newQuizSet = QuizSet(name: name, descript: descript)
-        listOfSets.append(newQuizSet)
+    func addSet(quiz: QuizSet) {
+        listOfSets.append(quiz)
     }
 }

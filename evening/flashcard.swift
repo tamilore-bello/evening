@@ -7,10 +7,10 @@
 
 import Foundation
 
-class Flashcard {
+class Flashcard: Identifiable {
     var term: String
     var def: String
-    var id = UUID()
+    let id = UUID()
     
     init(term: String, def: String) {
         self.term = term

@@ -1,20 +1,17 @@
-//
-//  ContentView.swift
-//  evening
-//
-//  Created by Milo Bello on 9/17/25.
-//
-
 import SwiftUI
+internal import Combine
 
+// VIEW: PARENT VIEW
 struct ContentView: View {
-    @StateObject private var vm = QuizViewModel()
+    // QuizViewModel object
+    @StateObject private var vm = QuizSetListViewModel()
     var body: some View {
         TabView {
             Tab("Home", systemImage: "house") {
             }
             Tab("Sets", systemImage: "archivebox") {
-                setTabView(viewModel: vm)
+                // set the "Sets" Tab to the Quiz Set List Viewmodel.
+                listOfQuizSetView(viewModel: vm)
             }
             Tab("Settings", systemImage: "gearshape") {
             }
@@ -22,145 +19,73 @@ struct ContentView: View {
     }
 }
 
-
-struct quizSetView: View {
-var quiz: QuizSet
-
+// VIEW: view for the list of all user quizSets
+struct listOfQuizSetView : View {
+    
+    // get the viewModel, and by default hide the
+    // newQuizSetView
     @State var showingPopover = false
+    @ObservedObject var viewModel: QuizSetListViewModel
     
     var body: some View {
-        List {
-            Section(header:
-                        VStack {
-                Text(quiz.name)
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+        NavigationStack {
+            Section(header: Text("Your Sets")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, 40)
+                .padding(.top, 50))
+            {
+                Text(String(viewModel.listOfSets.count)+" Sets")
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Text(quiz.descript)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.bottom, 25)
-                Button("edit set ►") {
-                    showingPopover = true
-                }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 40)
                     .padding(.bottom, 20)
-                    .popover(isPresented: $showingPopover) {
-                        newCardView()
-                    }
-                
-                
             }
-                    , footer:
-                HStack {
-                    Text("Description")
-                    Spacer()
-                    Text(String(quiz.cset.count)+" Terms")
-                }
-            
-            ) {
-                ForEach(quiz.cset, id: \.id) { card in
-                    NavigationLink {
-                        FlashcardView()
-                    } label : {
-                        HStack {
-                            Text(card.term)
-                            Spacer()
-                            Text(String(card.def))
-                        }
-                       
+            // Display the list of all quizSets
+            List(viewModel.listOfSets) { quiz in NavigationStack {
+                NavigationLink {
+                    quizSetView(quiz: quiz)
+                } label: {
+                    HStack {
+                        Text(quiz.name)
+                        Spacer()
+                        Text(String(quiz.cset.count)+" terms")
                     }
                 }
+            } }
+            // on click show the view for adding a new quizSet
+            Button(action:  {
+                showingPopover = true
+            })
+            {
+                Image(systemName: "plus")
+                    .frame(maxWidth: .infinity) // Apply to the label
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .font(.title.weight(.medium))
+                    .cornerRadius(20)
             }
-            
-        }
-    }
-    
-}
-
-struct FlashcardView: View {
-    var body: some View {
-        
-        Text("Flashcard")
-    }
-}
-
-struct editFlashcardView: View {
-    var body: some View {
-        
-        Text("Flashcard")
-    }
-}
-
-struct newCardView: View {
-    @State var term: String = ""
-    @State var def: String = ""
-    var body: some View {
-        Text("New Card").font(.title)
-            .fontWeight(.bold).padding(.top, 80)
-            .padding(.bottom, 25)
-        HStack {
-            VStack {
-                Text("Term")
-                TextEditor(
-                    //"Term",
-                    text: $term
-                )
-                .padding()
-                .frame(maxHeight: 100)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.blue, lineWidth: 2)
-                )
+            .popover(isPresented: $showingPopover) {
+                newSetView(viewModel: viewModel)
             }
-            VStack {
-                Text("Definition")
-                TextEditor(
-                    //"Definition",
-                    text: $def
-                )
-                .padding()
-                .frame(maxHeight: 100)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.gray, lineWidth: 2)
-                )
-            }
+            .frame(maxWidth: .infinity)
+            .padding()
         }
-        .padding(.leading, 50)
-        .padding(.trailing, 50)
-        Button(action:  {
-            // action here:???
-            
-        })
-        {
-            Image(systemName: "plus")
-                .frame(maxWidth: 200) // Apply to the label
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .font(.title.weight(.medium))
-                .cornerRadius(20)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        
-        VStack {
-            Button("Delete Set") {}.frame(alignment: .trailing)
-            Button("Rename Set") {}
-                .frame(alignment: .trailing)
-            Button("Edit Description") {}
-                .frame(alignment: .trailing)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
     }
 }
 
+// VIEW: view for creating a new quizSet
 struct newSetView: View {
-    @ObservedObject var viewModel: QuizViewModel
-
+    
+    // observable objects for the quizSetList
+    // and whether the view should be dismissed.
+    @ObservedObject var viewModel: QuizSetListViewModel
     @Environment(\.dismiss) private var dismiss
+    
     @State var title: String = ""
     @State var descr: String = ""
+    
     var body: some View {
         Text("Create a New Set").font(.title)
             .fontWeight(.bold).padding(.top, 80)
@@ -183,13 +108,17 @@ struct newSetView: View {
         }
         .padding(.leading, 50)
         .padding(.trailing, 50)
+        
+        // on click, the quizSet should be added to the list,
+        // and this view should be dismissed.
         Button(action:  {
-            viewModel.addSet(name: title, descript: descr)
+            let quiz = QuizSet(name: title, descript: descr)
+            viewModel.addSet(quiz: quiz)
             dismiss()
         })
         {
             Image(systemName: "plus")
-                .frame(maxWidth: 200) // Apply to the label
+                .frame(maxWidth: 200)
                 .padding()
                 .background(Color.blue)
                 .foregroundColor(.white)
@@ -201,57 +130,137 @@ struct newSetView: View {
     }
 }
 
-struct setTabView : View {
-    //let helper = viewModel()
+// VIEW: view a single quizSet
+struct quizSetView: View {
+    @StateObject var quiz: QuizSet
+    // @State var quiz: QuizSet
     @State var showingPopover = false
-    @ObservedObject var viewModel: QuizViewModel
+    // @StateObject var quiz = QuizSet
     
     var body: some View {
-        NavigationStack {
-            Section(header: Text("Your Sets")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading, 40)
-                .padding(.top, 50))
-            {
-                Text(String(viewModel.listOfSets.count)+" Sets")
+        List {
+            Section(header:
+                        VStack {
+                Text(quiz.name)
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, 40)
+                Text(quiz.descript)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, 25)
+                Button("edit set ►") {
+                    showingPopover = true
+                }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.bottom, 20)
+                    .popover(isPresented: $showingPopover) {
+                        newCardView(quiz: quiz)
+                    }
             }
-            List(viewModel.listOfSets, id: \.name) { quiz in NavigationStack {
-                NavigationLink {
-                    quizSetView(quiz: quiz)
-                } label: {
-                    HStack {
-                        Text(quiz.name)
-                        Spacer()
-                        Text(String(quiz.cset.count)+" terms")
+                    , footer:
+                HStack {
+                    Text("Description")
+                    Spacer()
+                    Text(String(quiz.cset.count)+" Terms")
+                }
+            
+            ) {
+                ForEach(quiz.cset, id: \.id) { card in
+                    NavigationLink {
+                        FlashcardView()
+                    } label : {
+                        HStack {
+                            Text(card.term)
+                            Spacer()
+                            Text(String(card.def))
+                        }
                     }
                 }
-            } }
+            }
             
-            Button(action:  {
-                showingPopover = true
-            })
-            {
-                Image(systemName: "plus")
-                    .frame(maxWidth: .infinity) // Apply to the label
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .font(.title.weight(.medium))
-                    .cornerRadius(20)
-            }
-            .popover(isPresented: $showingPopover) {
-                newSetView(viewModel: viewModel)
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
         }
     }
 }
+
+// VIEW: view for adding a new card to a quizSet
+struct newCardView: View {
+    @State var term: String = ""
+    @State var def: String = ""
+    var quiz: QuizSet
+    
+    var body: some View {
+        Text("New Card").font(.title)
+            .fontWeight(.bold).padding(.top, 80)
+            .padding(.bottom, 25)
+        HStack {
+            VStack {
+                Text("Term")
+                TextEditor(
+                    text: $term
+                )
+                .padding()
+                .frame(maxHeight: 100)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.blue, lineWidth: 2)
+                )
+            }
+            VStack {
+                Text("Definition")
+                TextEditor(
+                    text: $def
+                )
+                .padding()
+                .frame(maxHeight: 100)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.gray, lineWidth: 2)
+                )
+            }
+        }
+        .padding(.leading, 50)
+        .padding(.trailing, 50)
+        Button(action:  {
+            let flashcard = Flashcard(term: term, def: def)
+             quiz.addFlashCard(card: flashcard)
+            
+            
+        })
+        {
+            Image(systemName: "plus")
+                .frame(maxWidth: 200)
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .font(.title.weight(.medium))
+                .cornerRadius(20)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        VStack {
+            Button("Delete Set") {}.frame(alignment: .trailing)
+            Button("Rename Set") {}
+                .frame(alignment: .trailing)
+            Button("Edit Description") {}
+                .frame(alignment: .trailing)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+    }
+}
+
+struct FlashcardView: View {
+    var body: some View {
+        Text("Flashcard")
+    }
+}
+
+struct editFlashcardView: View {
+    var body: some View {
+        
+        Text("Flashcard")
+    }
+}
+
 
 #Preview {
     ContentView()
