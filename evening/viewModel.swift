@@ -17,6 +17,9 @@ class QuizSetListViewModel: ObservableObject {
         return listOfSets
     }
     
+    func execdb () {
+        dbinit()
+    }
 //    func exec() -> [QuizSet] {
 //        // intantiate the quiz set and terms
 //        let t1 = Flashcard(term: "apple", def: "a crunchy, red fruit")

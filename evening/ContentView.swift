@@ -8,6 +8,10 @@ struct ContentView: View {
     var body: some View {
         TabView {
             Tab("Home", systemImage: "house") {
+                Text("hey") .onAppear {
+                    vm.execdb()
+                    print("haha")
+                }
             }
             Tab("Sets", systemImage: "archivebox") {
                 // set the "Sets" Tab to the Quiz Set List Viewmodel.
@@ -49,7 +53,7 @@ struct listOfQuizSetView : View {
                     HStack {
                         Text(quiz.name)
                         Spacer()
-                        Text(String(quiz.cset.count)+" terms")
+                        // Text(String(quiz.cset.count)+" terms")
                     }
                 }
             } }
@@ -167,7 +171,7 @@ struct quizSetView: View {
             ) {
                 ForEach(quiz.cset, id: \.id) { card in
                     NavigationLink {
-                        FlashcardView()
+                        FlashcardView(flashcard: card)
                     } label : {
                         HStack {
                             Text(card.term)
@@ -184,6 +188,8 @@ struct quizSetView: View {
 
 // VIEW: view for adding a new card to a quizSet
 struct newCardView: View {
+    @Environment(\.dismiss) private var dismiss
+
     @State var term: String = ""
     @State var def: String = ""
     var quiz: QuizSet
@@ -223,7 +229,7 @@ struct newCardView: View {
         Button(action:  {
             let flashcard = Flashcard(term: term, def: def)
              quiz.addFlashCard(card: flashcard)
-            
+            dismiss()
             
         })
         {
@@ -249,14 +255,14 @@ struct newCardView: View {
 }
 
 struct FlashcardView: View {
+    var flashcard: Flashcard
     var body: some View {
-        Text("Flashcard")
+        Text(flashcard.term)
     }
 }
 
 struct editFlashcardView: View {
     var body: some View {
-        
         Text("Flashcard")
     }
 }
