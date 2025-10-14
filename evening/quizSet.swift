@@ -14,21 +14,27 @@ class QuizSet : ObservableObject, Identifiable {
     @Published var cset: [Flashcard] = []
     @Published var descript: String = ""
     
-    let id = UUID()
+    @Published var id = UUID() // change to let later!!
     
     func addFlashCard(card: Flashcard) {
         cset.append(card)
     }
     
-    init(name: String, cset: [Flashcard]) {
+   
+    init(id: UUID, name: String, descript: String) {
+        //self.id = id.uuidString
         self.name = name
-        self.cset = cset
+        self.descript = descript
     }
-    
     init(name: String, cset: [Flashcard], descript: String) {
         self.name = name
         self.cset = cset
         self.descript = descript
+    }
+    
+    init(name: String, cset: [Flashcard]) {
+        self.name = name
+        self.cset = cset
     }
     
     init(name: String, descript: String) {

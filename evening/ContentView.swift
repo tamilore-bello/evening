@@ -9,18 +9,20 @@ struct ContentView: View {
         TabView {
             Tab("Home", systemImage: "house") {
                 Text("hey") .onAppear {
-                    vm.execdb()
-                    print("haha")
+                    //vm.execdb()
                 }
             }
             Tab("Sets", systemImage: "archivebox") {
                 // set the "Sets" Tab to the Quiz Set List Viewmodel.
                 listOfQuizSetView(viewModel: vm)
             }
+            
+        
             Tab("Settings", systemImage: "gearshape") {
             }
         }
     }
+
 }
 
 // VIEW: view for the list of all user quizSets
@@ -32,6 +34,7 @@ struct listOfQuizSetView : View {
     @ObservedObject var viewModel: QuizSetListViewModel
     
     var body: some View {
+
         NavigationStack {
             Section(header: Text("Your Sets")
                 .font(.largeTitle)
@@ -44,6 +47,8 @@ struct listOfQuizSetView : View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.leading, 40)
                     .padding(.bottom, 20)
+            } .onAppear() {
+                viewModel.refreshListOfSets()
             }
             // Display the list of all quizSets
             List(viewModel.listOfSets) { quiz in NavigationStack {

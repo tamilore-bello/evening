@@ -14,12 +14,40 @@ class QuizSetListViewModel: ObservableObject {
     @Published var listOfSets: [QuizSet] = []
     
     func getSets() -> [QuizSet] {
-        return listOfSets
+        let db = dbinit()
+        do {
+            print("fetching logs...")
+            refreshListOfSets()
+            return try fetchloqs(db: db)
+        } catch {
+            print("failed to fetch list of quiz sets")
+            return []
+        }
+        
     }
     
-    func execdb () {
-        dbinit()
+    func refreshListOfSets() {
+        let db = dbinit()
+        do {
+            print("fetching logs for refresh...")
+            listOfSets = try fetchloqs(db: db)
+        } catch {
+            print("failed to refresh list of quiz sets")
+        }
     }
+    
+/**
+    func execdb () {
+        let db = dbinit()
+        let qs = QuizSet(name: "fruits", descript: "flavorful things")
+        do {
+            print(try addQuizSettoDB(quizSet: qs, into: db))
+        } catch {
+            print("we failed")
+        }
+    }
+**/
+    
 //    func exec() -> [QuizSet] {
 //        // intantiate the quiz set and terms
 //        let t1 = Flashcard(term: "apple", def: "a crunchy, red fruit")
@@ -45,6 +73,14 @@ class QuizSetListViewModel: ObservableObject {
 //    }
     
     func addSet(quiz: QuizSet) {
-        listOfSets.append(quiz)
+        // listOfSets.append(quiz)
+        let db = dbinit()
+        do {
+            print("adding quizSets...")
+            try addQuizSettoDB(quizSet: quiz, into: db)
+            refreshListOfSets()
+        } catch {
+            print("failure to add quizSet")
+        }
     }
 }

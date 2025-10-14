@@ -1,14 +1,14 @@
 CREATE TABLE IF NOT EXISTS ListOfQuizSet (
-    id INTEGER PRIMARY KEY,
+    id TEXT PRIMARY KEY,
     name TEXT,
     descript TEXT
 );
 
 CREATE TABLE IF NOT EXISTS ListOfFlashcard (
-    id INTEGER PRIMARY KEY,
+    id TEXT PRIMARY KEY,
     term TEXT,
     def TEXT,
-    parent_id INTEGER,
+    parent_id TEXT,
     FOREIGN KEY (parent_id) REFERENCES ListOfQuizSet(id)
 );
 
