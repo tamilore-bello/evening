@@ -53,7 +53,7 @@ struct listOfQuizSetView : View {
             // Display the list of all quizSets
             List(viewModel.listOfSets) { quiz in NavigationStack {
                 NavigationLink {
-                    quizSetView(quiz: quiz)
+                    quizSetView(viewModel: viewModel, quiz: quiz)
                 } label: {
                     HStack {
                         Text(quiz.name)
@@ -141,6 +141,7 @@ struct newSetView: View {
 
 // VIEW: view a single quizSet
 struct quizSetView: View {
+    @ObservedObject var viewModel: QuizSetListViewModel
     @StateObject var quiz: QuizSet
     // @State var quiz: QuizSet
     @State var showingPopover = false
@@ -163,7 +164,10 @@ struct quizSetView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.bottom, 20)
                     .popover(isPresented: $showingPopover) {
-                        newCardView(quiz: quiz)
+                        newCardView(viewmodel: viewModel, quiz: quiz)
+                    }
+                    .onAppear {
+                        // refresh the list.
                     }
             }
                     , footer:
@@ -189,12 +193,16 @@ struct quizSetView: View {
             
         }
     }
+        
 }
+    
+
+//    @ObservedObject var viewModel: QuizSetListViewModel
 
 // VIEW: view for adding a new card to a quizSet
 struct newCardView: View {
     @Environment(\.dismiss) private var dismiss
-
+    @ObservedObject var viewmodel: QuizSetListViewModel
     @State var term: String = ""
     @State var def: String = ""
     var quiz: QuizSet
@@ -233,7 +241,7 @@ struct newCardView: View {
         .padding(.trailing, 50)
         Button(action:  {
             let flashcard = Flashcard(term: term, def: def)
-             quiz.addFlashCard(card: flashcard)
+            viewmodel.addFlashcard(quiz: quiz, flashcard: flashcard)
             dismiss()
             
         })

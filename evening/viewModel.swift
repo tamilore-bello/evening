@@ -36,42 +36,7 @@ class QuizSetListViewModel: ObservableObject {
         }
     }
     
-/**
-    func execdb () {
-        let db = dbinit()
-        let qs = QuizSet(name: "fruits", descript: "flavorful things")
-        do {
-            print(try addQuizSettoDB(quizSet: qs, into: db))
-        } catch {
-            print("we failed")
-        }
-    }
-**/
-    
-//    func exec() -> [QuizSet] {
-//        // intantiate the quiz set and terms
-//        let t1 = Flashcard(term: "apple", def: "a crunchy, red fruit")
-//        let t2 = Flashcard(term: "pear", def: "a crunchy, oddly-shaped fruit")
-//        
-//        let qs = QuizSet(name: "fruits")
-//        let qs2 = QuizSet(name: "vegetables")
-//      
-//        qs.addFlashCard(card: t1)
-//        qs.addFlashCard(card: t2)
-//        
-//        listOfSets.append(qs)
-//        listOfSets.append(qs2)
-//        for _ in 1...30 {
-//            listOfSets.append(qs2)
-//        }
-//                
-//        return listOfSets
-//        
-//        func addSet() {
-//            
-//        }
-//    }
-    
+
     func addSet(quiz: QuizSet) {
         // listOfSets.append(quiz)
         let db = dbinit()
@@ -82,5 +47,9 @@ class QuizSetListViewModel: ObservableObject {
         } catch {
             print("failure to add quizSet")
         }
+    }
+    
+    func addFlashcard(quiz: QuizSet, flashcard: Flashcard) {
+        
     }
 }
