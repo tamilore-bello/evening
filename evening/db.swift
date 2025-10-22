@@ -8,6 +8,7 @@
 import SQLite
 import Foundation
 
+// initialize database!
 func dbinit () -> Connection {
     let dbPath = try! FileManager
         .default
@@ -36,6 +37,7 @@ func dbinit () -> Connection {
     return db
 }
 
+// adds a quiz set to the user's list of quiz sets.
 func addQuizSettoDB(quizSet: QuizSet, into db: Connection) throws {
     
     let loqs = Table("ListOfQuizSet")
@@ -51,8 +53,7 @@ func addQuizSettoDB(quizSet: QuizSet, into db: Connection) throws {
     }
 }
 
-
-
+// fetches all the user's quiz sets.
 func fetchloqs(db: Connection) throws -> [QuizSet] {
     let loqs = Table("ListOfQuizSet")
     let id = Expression<String>("id")
@@ -63,9 +64,41 @@ func fetchloqs(db: Connection) throws -> [QuizSet] {
         for row in try db.prepare(loqs)
         {
             let uuids = UUID(uuidString: row[id])
-            let quiz = QuizSet(id: uuids ?? UUID(), name: row[name], descript: row[descript])
-            print(quiz.id)
-            listOfSets.append(quiz)
+            let quiz = QuizSet(id: uuids!, name: row[name], descript: row[descript])
+                listOfSets.append(quiz)
         }
     return listOfSets
+}
+
+// adds a flashcard to the table of all flashcards
+func addFCtoDB(quizSet: QuizSet, flashcard: Flashcard, into db: Connection) throws {
+    
+    let loqs = Table("ListOfFlashcard")
+    let id = Expression<String>("id")
+    let term = Expression<String>("term")
+    let def = Expression<String>("def")
+    let parent = Expression<String>("parent_id")
+    
+    do {
+        try db.run(loqs.insert(id <- flashcard.id.uuidString, term <- flashcard.term, def <- flashcard.def, parent <- quizSet.id.uuidString)
+        )
+    } catch {
+        print("Insert failed: \(error)")
+    }
+}
+
+// prints all the current cards, regardless of set!
+func printAllCards(db: Connection) throws {
+    print("started process")
+    let loqs = Table("ListOfFlashcard")
+    let id = Expression<String>("id")
+    let term = Expression<String>("term")
+    let def = Expression<String>("def")
+    let parent = Expression<String>("parent_id")
+    
+    for row in try db.prepare(loqs)
+    {
+       try print(row.get(id), row.get(term), row.get(def), row.get(parent))
+    }
+    print()
 }

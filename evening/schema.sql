@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS ListOfFlashcard (
     id TEXT PRIMARY KEY,
     term TEXT,
     def TEXT,
-    parent_id TEXT,
     FOREIGN KEY (parent_id) REFERENCES ListOfQuizSet(id)
 );
 

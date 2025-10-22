@@ -50,6 +50,12 @@ class QuizSetListViewModel: ObservableObject {
     }
     
     func addFlashcard(quiz: QuizSet, flashcard: Flashcard) {
-        
+        let db = dbinit()
+        do {
+            print("adding flashcard")
+            try addFCtoDB(quizSet: quiz, flashcard: flashcard, into: db)        
+        } catch {
+            print("failure to add flashcard")
+        }
     }
 }

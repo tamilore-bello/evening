@@ -22,7 +22,7 @@ class QuizSet : ObservableObject, Identifiable {
     
    
     init(id: UUID, name: String, descript: String) {
-        //self.id = id.uuidString
+        self.id = id
         self.name = name
         self.descript = descript
     }
