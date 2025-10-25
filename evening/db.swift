@@ -70,6 +70,24 @@ func fetchloqs(db: Connection) throws -> [QuizSet] {
     return listOfSets
 }
 
+// fetches all cards matching a particular parent ID
+func fetchCards(db: Connection, uuid: UUID) throws -> [Flashcard] {
+    let loqs = Table("ListOfFlashcard")
+    let id = Expression<String>("id")
+    let term = Expression<String>("term")
+    let def = Expression<String>("def")
+    let parent_id = Expression<String>("parent_id")
+    
+    var listOfFlashcard: [Flashcard] = []
+        for row in try db.prepare(loqs)
+        {
+            if row[parent_id] == uuid.uuidString {
+                listOfFlashcard.append(Flashcard(id: UUID(uuidString: row[id])!, term: row[term], def: row[def]))
+            }
+        }
+    return listOfFlashcard
+}
+
 // adds a flashcard to the table of all flashcards
 func addFCtoDB(quizSet: QuizSet, flashcard: Flashcard, into db: Connection) throws {
     
@@ -102,3 +120,4 @@ func printAllCards(db: Connection) throws {
     }
     print()
 }
+
