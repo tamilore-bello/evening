@@ -10,8 +10,9 @@ import SwiftUI
 internal import Combine
 
 class QuizSetListViewModel: ObservableObject {
-    @Published var message = "Hello, Single ViewModel!"
     @Published var listOfSets: [QuizSet] = []
+    @Published var listOfCard: [Flashcard] = []
+
     
     func getSets() -> [QuizSet] {
         let db = dbinit()
@@ -36,6 +37,15 @@ class QuizSetListViewModel: ObservableObject {
         }
     }
     
+    func refreshListOfCard(uuid: UUID) {
+        let db = dbinit()
+        do {
+            print("fetching logs for refresh...")
+            listOfCard = try fetchCards(db: db, uuid: uuid)
+        } catch {
+            print("failed to refresh list of quiz sets")
+        }
+    }
 
     func addSet(quiz: QuizSet) {
         // listOfSets.append(quiz)
@@ -53,9 +63,21 @@ class QuizSetListViewModel: ObservableObject {
         let db = dbinit()
         do {
             print("adding flashcard")
-            try addFCtoDB(quizSet: quiz, flashcard: flashcard, into: db)        
+            try addFCtoDB(quizSet: quiz, flashcard: flashcard, into: db)
+            refreshListOfCard(uuid: quiz.id)
         } catch {
             print("failure to add flashcard")
         }
+    }
+    
+    func getCards(uuid: UUID) -> [Flashcard] {
+        let db = dbinit()
+        do {
+            print("fetching flashcards...")
+            return try fetchCards(db: db, uuid: uuid)
+        } catch {
+            print("failed to fetch flashcards")
+        }
+        return []
     }
 }

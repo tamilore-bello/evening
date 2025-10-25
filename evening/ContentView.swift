@@ -178,7 +178,7 @@ struct quizSetView: View {
                 }
             
             ) {
-                ForEach(quiz.cset, id: \.id) { card in
+                ForEach(viewModel.getCards(uuid: quiz.id), id: \.id) { card in
                     NavigationLink {
                         FlashcardView(flashcard: card)
                     } label : {
@@ -270,7 +270,8 @@ struct newCardView: View {
 struct FlashcardView: View {
     var flashcard: Flashcard
     var body: some View {
-        Text(flashcard.term)
+        Text(flashcard.term).font(.headline)
+        Text(flashcard.def)
     }
 }
 
